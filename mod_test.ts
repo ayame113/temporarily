@@ -8,9 +8,9 @@ Deno.test(function parseTest() {
   {
     const res = parse("2001-12-10", "YYYY-MM-DD");
     assertEquals(res, {
-      year: "2001",
-      month: "12",
-      day: "10",
+      year: 2001,
+      month: 12,
+      day: 10,
       hour: 0,
       minute: 0,
       second: 0,
@@ -19,6 +19,8 @@ Deno.test(function parseTest() {
       unixtime: 0,
     });
   }
+
+  // failed to parse if invalid
   assertThrows(() => {
     parse("aaaaaaa", "YYYY-MM-DD");
   });

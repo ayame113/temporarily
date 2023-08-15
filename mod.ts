@@ -60,23 +60,16 @@ export function parse(str: string, format: string) {
 
   const { groups } = matchResult;
   return {
-    year: groups?.year != undefined ? groups.year : 0,
-    month: groups?.month != undefined ? groups.month : 0,
-    day: groups?.day != undefined ? groups.day : 0,
-    hour: groups?.hour != undefined ? groups.hour : 0,
-    minute: groups?.minute != undefined ? groups.minute : 0,
-    second: groups?.second != undefined ? groups.second : 0,
-    millisecond: groups?.millisecond != undefined ? groups.millisecond : 0,
+    year: groups?.year != undefined ? Number(groups.year) : 0,
+    month: groups?.month != undefined ? Number(groups.month) : 0,
+    day: groups?.day != undefined ? Number(groups.day) : 0,
+    hour: groups?.hour != undefined ? Number(groups.hour) : 0,
+    minute: groups?.minute != undefined ? Number(groups.minute) : 0,
+    second: groups?.second != undefined ? Number(groups.second) : 0,
+    millisecond: groups?.millisecond != undefined
+      ? Number(groups.millisecond)
+      : 0,
     ampm: groups?.ampm?.toLowerCase(),
-    unixtime: groups?.unixtime != undefined ? groups.unixtime : 0,
+    unixtime: groups?.unixtime != undefined ? Number(groups.unixtime) : 0,
   };
-  // let formatRegexp = format;
-  // for (const [formatString, type, regexp] of formats) {
-  //   formatRegexp = formatRegexp.replaceAll(
-  //     formatString,
-  //     `(?<${type}>${regexp})`,
-  //   );
-  // }
-  // console.log(new RegExp(`^${formatRegexp}$`));
-  // return str.match(new RegExp(formatRegexp));
 }
