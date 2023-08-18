@@ -26,8 +26,16 @@ export function plainDateTime(input: string, format: string) {
         "You cannot specify AM or PM for times with hours greater than 12 hours.",
       );
     }
+
+    // AM12時/PM12時対応
     if (parsed.ampm === "pm") {
-      hour += 12;
+      if (hour < 12) {
+        hour += 12;
+      }
+    } else {
+      if (hour == 12) {
+        hour = 0;
+      }
     }
   }
   return Temporal.PlainDateTime.from({
