@@ -1,0 +1,6 @@
+{
+  "tasks": {
+    "test": "deno test",
+    "check": "deno check ./mod.ts"
+  }
+}
