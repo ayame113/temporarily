@@ -1,6 +1,7 @@
 {
   "tasks": {
-    "test": "deno test",
+    "test": "deno test --doc",
     "check": "deno check ./mod.ts"
-  }
+  },
+  "lock": false
 }
