@@ -45,6 +45,6 @@ export function plainDateTime(input: string, format: string) {
     hour: hour,
     minute: parsed.minute,
     second: parsed.second,
-    millisecond: parsed.millisecond,
+    nanosecond: parsed.nanosecond,
   });
 }
