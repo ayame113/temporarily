@@ -163,6 +163,24 @@ function getRegexp(format: string) {
   }$`);
 }
 
+/**
+ * parsing datetime string.
+ *
+ *
+ * ```
+ * import { parse } from "@ayame113/temporarily";
+ *
+ * const parsed = parse("2024-05-03 15:25:29", "%Y-%m-%d %H:%M:%S");
+ * console.log(parsed); // { year: 2024, month: 5, day: 3, hour: 15, minute: 25, second: 29 }
+ *
+ * const date = Temporal.PlainDateTime.from(parsed);
+ * console.log(date); // Temporal { 2024-05-03T15:25:29 }
+```
+ *
+ * @param input string you want to parse
+ * @param format format of string
+ * @returns parsed result
+ */
 export function parse(input: string, format: string): ParseResult {
   const formatRegexpSource = getRegexp(format);
   const matchResult = input.match(formatRegexpSource);
