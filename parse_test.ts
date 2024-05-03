@@ -1,34 +1,30 @@
-import {
-  assert,
-  assertEquals,
-  assertThrows,
-} from "https://deno.land/std@0.198.0/assert/mod.ts";
+import { assertEquals, assertThrows } from "@std/assert";
 import { parse } from "./parse.ts";
 
 Deno.test({
   name: "parser",
   fn() {
-    assertEquals(parse("2001-12-10 10:21", "YYYY-MM-DD HH:mm"), {
+    assertEquals(parse("2001-12-10 10:21:30", "%Y-%m-%d %H:%M:%S"), {
       year: 2001,
       month: 12,
       day: 10,
       hour: 10,
       minute: 21,
-      second: 0,
+      second: 30,
+      millisecond: 0,
       nanosecond: 0,
-      ampm: undefined,
       unixtime: undefined,
     });
 
-    assertEquals(parse("([2001-12-10])\\", "([YYYY-MM-DD])\\"), {
+    assertEquals(parse("([2001-12-10])\\", "([%Y-%m-%d])\\"), {
       year: 2001,
       month: 12,
       day: 10,
       hour: 0,
       minute: 0,
       second: 0,
+      millisecond: 0,
       nanosecond: 0,
-      ampm: undefined,
       unixtime: undefined,
     });
   },
@@ -44,81 +40,196 @@ Deno.test({
       hour: 0,
       minute: 0,
       second: 0,
+      millisecond: 0,
       nanosecond: 0,
-      ampm: undefined,
       unixtime: undefined,
     });
   },
 });
 
-const test = {
-  year: {
-    valid: range(-2000, 3000),
-    invalid: ["aaaaa"],
-    formats: {
-      "%Y": { zeroPadding: true, noPadding: true, spacePadding: true },
-      "%0Y": { zeroPadding: true, noPadding: false, spacePadding: false },
-      "%-Y": { zeroPadding: false, noPadding: true, spacePadding: false },
-      "%_Y": { zeroPadding: false, noPadding: false, spacePadding: true },
-    },
-    padTo: 4,
+Deno.test({
+  name: "parser - %Y",
+  fn() {
+    assertEquals(parse("0000", "%Y").year, 0); // allow 0year
+    assertEquals(parse("1999", "%Y").year, 1999);
+    assertEquals(parse("2001", "%Y").year, 2001);
+    assertEquals(parse("-99999", "%Y").year, -99999);
+    assertEquals(parse("-1111", "%Y").year, -1111);
+    assertEquals(parse("-1", "%Y").year, -1);
+    assertEquals(parse("-0", "%Y").year, -0);
+    assertEquals(parse("+0", "%Y").year, 0);
+    assertEquals(parse("+1", "%Y").year, 1);
+    assertEquals(parse("+1111", "%Y").year, 1111);
+    assertEquals(parse("+99999", "%Y").year, 99999);
+    assertThrows(() => parse("1", "%Y"), TypeError);
+    assertThrows(() => parse("111", "%Y"), TypeError);
+    assertThrows(() => parse("aaaa", "%Y"), TypeError);
+    assertThrows(() => parse("11111", "%Y"), TypeError);
   },
-} as const;
+});
 
-for (const [target, testCases] of Object.entries(test)) {
-  for (const [format, formatTypes] of Object.entries(testCases.formats)) {
-    for (const number of testCases.valid) {
-      const targetString = {
-        noPadding: number.toString(),
-        zeroPadding: number < 0
-          ? "-" +
-            (-number).toString().padStart(testCases.padTo, "0")
-          : number.toString().padStart(testCases.padTo, "0"),
-        spacePadding: number.toString().padStart(testCases.padTo, " "),
-      };
-      const valids = new Set<string>();
-      const invalids = new Set<string>(Object.values(targetString));
-      for (
-        const type of ["noPadding", "zeroPadding", "spacePadding"] as const
-      ) {
-        if (formatTypes[type]) {
-          valids.add(targetString[type]);
-          invalids.delete(targetString[type]);
-        }
-      }
-      for (const validString of valids) {
-        Deno.test({
-          name: `${target} ${format} "${validString}" (valid)`,
-          fn() {
-            assertEquals(
-              parse(validString, format)[target as keyof typeof test],
-              number,
-            );
-          },
-        });
-      }
-      for (const invalidString of invalids) {
-        Deno.test({
-          name: `${target} ${format} "${invalidString}" (invalid)`,
-          fn() {
-            assertThrows(
-              () => parse(invalidString, format)[target as keyof typeof test],
-              TypeError,
-            );
-          },
-        });
-      }
-    }
-  }
-}
+Deno.test({
+  name: "parser - %m",
+  fn() {
+    assertEquals(parse("01", "%m").month, 1);
+    assertEquals(parse("02", "%m").month, 2);
+    assertEquals(parse("03", "%m").month, 3);
+    assertEquals(parse("04", "%m").month, 4);
+    assertEquals(parse("05", "%m").month, 5);
+    assertEquals(parse("06", "%m").month, 6);
+    assertEquals(parse("07", "%m").month, 7);
+    assertEquals(parse("08", "%m").month, 8);
+    assertEquals(parse("09", "%m").month, 9);
+    assertEquals(parse("10", "%m").month, 10);
+    assertEquals(parse("11", "%m").month, 11);
+    assertEquals(parse("12", "%m").month, 12);
+    assertThrows(() => parse("00", "%m"), TypeError);
+    assertThrows(() => parse("0", "%m"), TypeError);
+    assertThrows(() => parse("1", "%m"), TypeError);
+    assertThrows(() => parse("13", "%m"), TypeError);
+    assertThrows(() => parse("111", "%m"), TypeError);
+  },
+});
 
-function range(from: number, to: number) {
-  const res = [];
-  for (let i = from; i <= to; i++) {
-    res.push(i);
-  }
-  return res;
-}
+Deno.test({
+  name: "parser - %-m",
+  fn() {
+    assertEquals(parse("1", "%-m").month, 1);
+    assertEquals(parse("2", "%-m").month, 2);
+    assertEquals(parse("3", "%-m").month, 3);
+    assertEquals(parse("4", "%-m").month, 4);
+    assertEquals(parse("5", "%-m").month, 5);
+    assertEquals(parse("6", "%-m").month, 6);
+    assertEquals(parse("7", "%-m").month, 7);
+    assertEquals(parse("8", "%-m").month, 8);
+    assertEquals(parse("9", "%-m").month, 9);
+    assertEquals(parse("10", "%-m").month, 10);
+    assertEquals(parse("11", "%-m").month, 11);
+    assertEquals(parse("12", "%-m").month, 12);
+    assertThrows(() => parse("00", "%-m"), TypeError);
+    assertThrows(() => parse("01", "%-m"), TypeError);
+    assertThrows(() => parse("09", "%-m"), TypeError);
+    assertThrows(() => parse("0", "%-m"), TypeError);
+    assertThrows(() => parse("13", "%-m"), TypeError);
+    assertThrows(() => parse("111", "%-m"), TypeError);
+  },
+});
+
+Deno.test({
+  name: "parser - %d",
+  fn() {
+    assertEquals(parse("01", "%d").day, 1);
+    assertEquals(parse("02", "%d").day, 2);
+    assertEquals(parse("03", "%d").day, 3);
+    assertEquals(parse("04", "%d").day, 4);
+    assertEquals(parse("05", "%d").day, 5);
+    assertEquals(parse("06", "%d").day, 6);
+    assertEquals(parse("07", "%d").day, 7);
+    assertEquals(parse("08", "%d").day, 8);
+    assertEquals(parse("09", "%d").day, 9);
+    assertEquals(parse("10", "%d").day, 10);
+    assertEquals(parse("30", "%d").day, 30);
+    assertEquals(parse("31", "%d").day, 31);
+    assertThrows(() => parse("00", "%d"), TypeError);
+    assertThrows(() => parse("32", "%d"), TypeError);
+    assertThrows(() => parse("0", "%d"), TypeError);
+    assertThrows(() => parse("1", "%d"), TypeError);
+    assertThrows(() => parse("111", "%d"), TypeError);
+  },
+});
+
+Deno.test({
+  name: "parser - %-d",
+  fn() {
+    assertEquals(parse("1", "%-d").day, 1);
+    assertEquals(parse("2", "%-d").day, 2);
+    assertEquals(parse("3", "%-d").day, 3);
+    assertEquals(parse("4", "%-d").day, 4);
+    assertEquals(parse("5", "%-d").day, 5);
+    assertEquals(parse("6", "%-d").day, 6);
+    assertEquals(parse("7", "%-d").day, 7);
+    assertEquals(parse("8", "%-d").day, 8);
+    assertEquals(parse("9", "%-d").day, 9);
+    assertEquals(parse("10", "%-d").day, 10);
+    assertEquals(parse("30", "%-d").day, 30);
+    assertEquals(parse("31", "%-d").day, 31);
+    assertThrows(() => parse("00", "%-d"), TypeError);
+    assertThrows(() => parse("01", "%-d"), TypeError);
+    assertThrows(() => parse("09", "%-d"), TypeError);
+    assertThrows(() => parse("32", "%-d"), TypeError);
+    assertThrows(() => parse("0", "%-d"), TypeError);
+    assertThrows(() => parse("111", "%-d"), TypeError);
+  },
+});
+
+// const test = {
+//   year: {
+//     valid: range(-2000, 3000),
+//     invalid: ["aaaaa"],
+//     formats: {
+//       "%Y": { zeroPadding: true, noPadding: true, spacePadding: true },
+//       "%0Y": { zeroPadding: true, noPadding: false, spacePadding: false },
+//       // "%-Y": { zeroPadding: false, noPadding: true, spacePadding: false },
+//       // "%_Y": { zeroPadding: false, noPadding: false, spacePadding: true },
+//     },
+//     padTo: 4,
+//   },
+// } as const;
+
+// for (const [target, testCases] of Object.entries(test)) {
+//   for (const [format, formatTypes] of Object.entries(testCases.formats)) {
+//     for (const number of testCases.valid) {
+//       const targetString = {
+//         noPadding: number.toString(),
+//         zeroPadding: number < 0
+//           ? "-" +
+//             (-number).toString().padStart(testCases.padTo, "0")
+//           : number.toString().padStart(testCases.padTo, "0"),
+//         spacePadding: number.toString().padStart(testCases.padTo, " "),
+//       };
+//       const valids = new Set<string>();
+//       const invalids = new Set<string>(Object.values(targetString));
+//       for (
+//         const type of ["noPadding", "zeroPadding", "spacePadding"] as const
+//       ) {
+//         if (formatTypes[type]) {
+//           valids.add(targetString[type]);
+//           invalids.delete(targetString[type]);
+//         }
+//       }
+//       for (const validString of valids) {
+//         Deno.test({
+//           name: `${target} ${format} "${validString}" (valid)`,
+//           fn() {
+//             assertEquals(
+//               parse(validString, format)[target as keyof typeof test],
+//               number,
+//             );
+//           },
+//         });
+//       }
+//       for (const invalidString of invalids) {
+//         Deno.test({
+//           name: `${target} ${format} "${invalidString}" (invalid)`,
+//           fn() {
+//             assertThrows(
+//               () => parse(invalidString, format)[target as keyof typeof test],
+//               TypeError,
+//             );
+//           },
+//         });
+//       }
+//     }
+//   }
+// }
+
+// function range(from: number, to: number) {
+//   const res = [];
+//   for (let i = from; i <= to; i++) {
+//     res.push(i);
+//   }
+//   return res;
+// }
 
 // Deno.test({
 //   name: "parser - YYYY",
@@ -534,27 +645,27 @@ function range(from: number, to: number) {
 //   },
 // });
 
-// Deno.test({
-//   name: "parser - A",
-//   fn() {
-//     assertEquals(parse("AM", "A").ampm, "am");
-//     assertEquals(parse("PM", "A").ampm, "pm");
-//     assertThrows(() => parse("am", "A"), TypeError);
-//     assertThrows(() => parse("pm", "A"), TypeError);
-//     assertThrows(() => parse("xxx", "A"), TypeError);
-//   },
-// });
+Deno.test({
+  name: "parser - %P",
+  fn() {
+    assertEquals(parse("am", "%P").hour, 0);
+    assertEquals(parse("pm", "%P").hour, 12);
+    assertThrows(() => parse("AM", "%P"), TypeError);
+    assertThrows(() => parse("PM", "%P"), TypeError);
+    assertThrows(() => parse("xxx", "%P"), TypeError);
+  },
+});
 
-// Deno.test({
-//   name: "parser - a",
-//   fn() {
-//     assertEquals(parse("am", "a").ampm, "am");
-//     assertEquals(parse("pm", "a").ampm, "pm");
-//     assertThrows(() => parse("AM", "a"), TypeError);
-//     assertThrows(() => parse("PM", "a"), TypeError);
-//     assertThrows(() => parse("xxx", "a"), TypeError);
-//   },
-// });
+Deno.test({
+  name: "parser - %p",
+  fn() {
+    assertEquals(parse("AM", "%p").hour, 0);
+    assertEquals(parse("PM", "%p").hour, 12);
+    assertThrows(() => parse("am", "%p"), TypeError);
+    assertThrows(() => parse("pm", "%p"), TypeError);
+    assertThrows(() => parse("xxx", "%p"), TypeError);
+  },
+});
 
 // Deno.test({
 //   name: "parser - X",
