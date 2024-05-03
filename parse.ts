@@ -167,7 +167,7 @@ function getRegexp(format: string) {
  * parsing datetime string.
  *
  *
- * ```
+ * ```ts
  * import { parse } from "@ayame113/temporarily";
  *
  * const parsed = parse("2024-05-03 15:25:29", "%Y-%m-%d %H:%M:%S");
