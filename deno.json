@@ -3,7 +3,7 @@
   "version": "0.0.4",
   "exports": "./mod.ts",
   "tasks": {
-    "test": "deno test",
+    "test": "deno test --unstable-temporal",
     "check": "deno check ./mod.ts"
   },
   "imports": {
