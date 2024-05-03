@@ -1,6 +1,6 @@
 {
   "name": "@ayame113/temporarily",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "exports": "./mod.ts",
   "tasks": {
     "test": "deno test --doc",

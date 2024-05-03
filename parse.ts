@@ -74,12 +74,12 @@ const formats: Record<string, { type?: FormatType; regexp: string }> = {
   // "%T": { type: "", regexp: "" }, // 00:34:60 時分秒形式。と同じ%H:%M:%S。
   // "%X": { type: "", regexp: "" }, // 00:34:60 ロケールの時間表現 (例: 23:13:48)。
   // "%r": { type: "", regexp: "" }, // 12:34:60 AM 12 時間制の時分秒形式。と同じ%I:%M:%S %p。
-  "%Z": { type: "timezone", regexp: "" }, // ACST ローカルタイムゾーン名。解析中に空白以外の文字をすべてスキップします。フォーマット時と同様%:z。6
-  "%z": { type: "offset", regexp: "" }, // +0930 現地時間から UTC までのオフセット (UTC は+0000)。
-  "%:z": { type: "offset", regexp: "" }, // +09:30 と同じです%zが、コロンが付いています。
-  "%::z": { type: "offset", regexp: "" }, // +09:30:00 現地時間から UTC までの秒単位のオフセット。
-  "%:::z": { type: "offset", regexp: "" }, // +09 分を含まない現地時間から UTC までのオフセット。
-  "%#z": { type: "offset", regexp: "" }, // +09 解析のみ:と同じです%zが、分の欠落または存在が許可されます。
+  // "%Z": { type: "timezone", regexp: "" }, // ACST ローカルタイムゾーン名。解析中に空白以外の文字をすべてスキップします。フォーマット時と同様%:z。6
+  // "%z": { type: "offset", regexp: "" }, // +0930 現地時間から UTC までのオフセット (UTC は+0000)。
+  // "%:z": { type: "offset", regexp: "" }, // +09:30 と同じです%zが、コロンが付いています。
+  // "%::z": { type: "offset", regexp: "" }, // +09:30:00 現地時間から UTC までの秒単位のオフセット。
+  // "%:::z": { type: "offset", regexp: "" }, // +09 分を含まない現地時間から UTC までのオフセット。
+  // "%#z": { type: "offset", regexp: "" }, // +09 解析のみ:と同じです%zが、分の欠落または存在が許可されます。
   // "%c": { type: "", regexp: "" }, // Sun Jul  8 00:34:60 2001 ロケールの日付と時刻 (例: Thu Mar 3 23:05:25 2005)。
   // "%+": { type: "", regexp: "" }, // 2001-07-08T00:34:60.026490+09:30 ISO 8601 / RFC 3339 の日付と時刻の形式。7
   "%s": { type: "unixtime", regexp: String.raw`\d+` }, // 994518299 UNIX タイムスタンプ、1970 年 1 月 1 日 00:00 UTC からの秒数。8
